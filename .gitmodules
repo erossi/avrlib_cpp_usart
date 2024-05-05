@@ -1,0 +1,3 @@
+[submodule "modules/circular_buffer"]
+	path = modules/circular_buffer
+	url = git@github.com:erossi/circular_buffer.git
