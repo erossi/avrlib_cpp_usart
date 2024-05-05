@@ -29,7 +29,7 @@
 
 #include <stdint.h>
 #include "usart_base.h"
-#include "avr_circular_buffer.h"
+#include "embed_circular_buffer.h"
 
 class Usart0_RxCBuffer : public Usart0_Base {
 	public:
