@@ -36,7 +36,7 @@ CXX := avr-g++
 BUILD_DIR := /run/user/$(shell id --user)/build
 
 # Include circular_buffer
-INC = -I../modules/circular_buffer/include/
+INC = -I$(PWD)/../modules/circular_buffer/include
 
 CXXFLAGS := $(INC) \
 	    -Wall \
