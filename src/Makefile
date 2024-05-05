@@ -21,7 +21,8 @@ LIB_NAME = usart
 # Overridable parameters
 export OPTLEV ?= 2
 export MCU ?= atmega1284p
-export FCPU ?= 8000000UL
+export FCPU ?= 1000000UL
+export DMACRO ?=
 
 PWD = $(shell pwd)
 INCLUDE_DIR := $(PWD)/../include
@@ -41,7 +42,7 @@ CXXFLAGS := $(INC) \
 	    -mmcu=$(MCU) \
 	    -O$(OPTLEV) \
 	    -fshort-enums \
-	    -D F_CPU=$(FCPU)
+	    $(DMACRO) -D F_CPU=$(FCPU)
 LFLAGS = -lm
 
 # Uncomment if git is in use
@@ -75,10 +76,14 @@ all: lib
 # Creates the object directory
 $(BUILD_DIR):
 	$P mkdir -p $(BUILD_DIR)
+
+$(LIB_DIR):
 	$P mkdir -p $(LIB_DIR)
+
+$(INCLUDE_DIR):
 	$P mkdir -p $(INCLUDE_DIR)
 
-lib: $(BUILD_DIR) $(common_o)
+lib: $(BUILD_DIR) $(LIB_DIR) $(INCLUDE_DIR) $(common_o)
 	$(Pecho) "  AR    lib$(LIB_NAME).a"
 	$P $(AR) rcs $(LIB_DIR)/lib$(LIBNAME).a $(addprefix $(BUILD_DIR)/, $(common_o))
 	$P cd $(LIB_DIR) && ln -sf lib$(LIBNAME).a lib$(LIB_NAME).a
