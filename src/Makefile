@@ -1,24 +1,27 @@
+# USART - Serial port library.
 # Copyright (C) 2017, 2020, 2024 Enrico Rossi
 #
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# This library is free software; you can redistribute it and/or
+# modify it under the terms of the GNU Lesser General Public
+# License as published by the Free Software Foundation; either
+# version 2.1 of the License, or (at your option) any later version.
 #
-# This program is distributed in the hope that it will be useful,
+# This library is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# Lesser General Public License for more details.
 #
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+# You should have received a copy of the GNU Lesser General Public
+# License along with this library; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301
+# USA
 
 LIB_NAME = usart
 
 # Overridable parameters
-OPTLEV ?= 2
-MCU ?= atmega1284p
-FCPU ?= 1000000UL
+export OPTLEV ?= 2
+export MCU ?= atmega1284p
+export FCPU ?= 8000000UL
 
 PWD = $(shell pwd)
 INCLUDE_DIR := $(PWD)/../include
@@ -44,7 +47,6 @@ LFLAGS = -lm
 # Uncomment if git is in use
 GIT_TAG = $(shell git describe --tags --long --always)
 LIBNAME := $(LIB_NAME)-$(GIT_TAG)-$(MCU)
-
 RM := rm -f
 
 .PHONY: clean indent
@@ -79,9 +81,10 @@ $(BUILD_DIR):
 lib: $(BUILD_DIR) $(common_o)
 	$(Pecho) "  AR    lib$(LIB_NAME).a"
 	$P $(AR) rcs $(LIB_DIR)/lib$(LIBNAME).a $(addprefix $(BUILD_DIR)/, $(common_o))
-	cd $(LIB_DIR) && ln -sf lib$(LIBNAME).a lib$(LIB_NAME).a
-	cd $(INCLUDE_DIR) && cp ../src/*.h .
-	cd $(INCLUDE_DIR) && cp ../modules/circular_buffer/include/*.h .
+	$P cd $(LIB_DIR) && ln -sf lib$(LIBNAME).a lib$(LIB_NAME).a
+	$(Pecho) "  INST  headers"
+	$P cd $(INCLUDE_DIR) && cp ../src/*.h .
+	$P cd $(INCLUDE_DIR) && cp ../modules/circular_buffer/include/*.h .
 
 tests: lib
 	cd $(PWD)/../tests && $(MAKE)
@@ -98,6 +101,8 @@ tests: lib
 ## CleanUp and tools
 #
 clean:
-	$(RM) -r $(LIB_DIR)
-	$(RM) -r $(INCLUDE_DIR)
-	$(RM) -r $(BUILD_DIR)
+	$P cd $(PWD)/../tests && $(MAKE) $@
+	$(Pecho) "  CLEAN"
+	$P $(RM) -r $(LIB_DIR)
+	$P $(RM) -r $(INCLUDE_DIR)
+	$P $(RM) -r $(BUILD_DIR)

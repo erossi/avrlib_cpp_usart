@@ -18,7 +18,7 @@
     Boston, MA  02110-1301  USA
  */
 
-/*! \file
+/** @file
  *
  * Read a char from a serial port and send it on the other port.
  */
