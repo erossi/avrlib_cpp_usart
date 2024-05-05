@@ -95,8 +95,8 @@ install: build $(INSTALL_INCLUDE) $(INSTALL_LIB)
 	$P cd $(INSTALL_LIB) && cp $(BUILD_DIR)/lib$(LIBNAME).a .
 	$P cd $(INSTALL_LIB) && ln -sf lib$(LIBNAME).a lib$(LIB_NAME).a
 	$(Pecho) "  INST  headers"
-	$P cd $(INSTALL_INCLUDE) && cp ../src/*.h .
-	$P cd $(INSTALL_INCLUDE) && cp ../modules/circular_buffer/include/*.h .
+	$P cd $(INSTALL_INCLUDE) && cp $(PWD)/*.h .
+	$P cd $(INSTALL_INCLUDE) && cp $(PWD)/../modules/circular_buffer/include/*.h .
 
 tests: install
 	cd $(PWD)/../tests && $(MAKE)
