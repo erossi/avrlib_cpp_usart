@@ -25,15 +25,19 @@ export FCPU ?= 1000000UL
 export DMACRO ?=
 
 PWD = $(shell pwd)
-INCLUDE_DIR := $(PWD)/../include
-LIB_DIR := $(PWD)/../lib
-INC = -I../modules/circular_buffer/include/
-INC += -I$(INCLUDE_DIR)/
+
+# Install target
+INSTALL_LIB ?= $(PWD)/../lib
+INSTALL_INCLUDE ?= $(PWD)/../include
 
 # Compilers
 AR := avr-ar
 CXX := avr-g++
 BUILD_DIR := /run/user/$(shell id --user)/build
+
+# Include circular_buffer
+INC = -I../modules/circular_buffer/include/
+
 CXXFLAGS := $(INC) \
 	    -Wall \
 	    -Wextra \
@@ -71,27 +75,30 @@ common_o := \
 	    usart_rxcbuffer_p2.o
 
 # Default target.
-all: lib
+all: build
 
 # Creates the object directory
 $(BUILD_DIR):
 	$P mkdir -p $(BUILD_DIR)
 
-$(LIB_DIR):
-	$P mkdir -p $(LIB_DIR)
+$(INSTALL_LIB):
+	$P mkdir -p $(INSTALL_LIB)
 
-$(INCLUDE_DIR):
-	$P mkdir -p $(INCLUDE_DIR)
+$(INSTALL_INCLUDE):
+	$P mkdir -p $(INSTALL_INCLUDE)
 
-lib: $(BUILD_DIR) $(LIB_DIR) $(INCLUDE_DIR) $(common_o)
-	$(Pecho) "  AR    lib$(LIB_NAME).a"
-	$P $(AR) rcs $(LIB_DIR)/lib$(LIBNAME).a $(addprefix $(BUILD_DIR)/, $(common_o))
-	$P cd $(LIB_DIR) && ln -sf lib$(LIBNAME).a lib$(LIB_NAME).a
+build: $(BUILD_DIR) $(common_o)
+	$(Pecho) "  BUILD lib$(LIB_NAME).a"
+	$P $(AR) rcs $(BUILD_DIR)/lib$(LIBNAME).a $(addprefix $(BUILD_DIR)/, $(common_o))
+
+install: build $(INSTALL_INCLUDE) $(INSTALL_LIB)
+	$P cd $(INSTALL_LIB) && cp $(BUILD_DIR)/lib$(LIBNAME).a .
+	$P cd $(INSTALL_LIB) && ln -sf lib$(LIBNAME).a lib$(LIB_NAME).a
 	$(Pecho) "  INST  headers"
-	$P cd $(INCLUDE_DIR) && cp ../src/*.h .
-	$P cd $(INCLUDE_DIR) && cp ../modules/circular_buffer/include/*.h .
+	$P cd $(INSTALL_INCLUDE) && cp ../src/*.h .
+	$P cd $(INSTALL_INCLUDE) && cp ../modules/circular_buffer/include/*.h .
 
-tests: lib
+tests: install
 	cd $(PWD)/../tests && $(MAKE)
 
 # Standard build
@@ -108,6 +115,6 @@ tests: lib
 clean:
 	$P cd $(PWD)/../tests && $(MAKE) $@
 	$(Pecho) "  CLEAN"
-	$P $(RM) -r $(LIB_DIR)
-	$P $(RM) -r $(INCLUDE_DIR)
+	$P $(RM) -r $(INSTALL_LIB)
+	$P $(RM) -r $(INSTALL_INCLUDE)
 	$P $(RM) -r $(BUILD_DIR)
